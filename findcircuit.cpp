@@ -49,15 +49,17 @@ std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<ED::size_typ
 	
 	return circuit;
 }
-
+// receives in "labels" the R-values for all nodes, in "label_sizes" the logarithmic size of the "pseudo-nodes", and the circuit for which the labels have to be upgraded
+// assignes for all "old roots" whose partition classes are included in the circuit the new root and updates the sizes if necessary
 void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit)
 {
-	std::vector<ED::NodeId> roots;
-	std::vector<ED::size_type> root_sizes;
+	std::vector<ED::NodeId> roots; // will save for all nodes in the circuit their current roots
+	std::vector<ED::size_type> root_sizes; // will save for all the roots in roots the current size of their unions
 	for(unsigned int i =0; i<circuit.size()-1;i++)
 	{
 		ED::NodeId candidate = circuit.at(i);
-		while(candidate!=labels.at(candidate))
+		//finds the root of the partition class the vertex at circuit.at(i) is currently in
+		while(candidate!=labels.at(candidate)) 
 			candidate=labels.at(candidate);
 		roots.push_back(candidate);
 		root_sizes.push_back(label_sizes.at(candidate));
