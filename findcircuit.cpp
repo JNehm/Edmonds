@@ -1,13 +1,11 @@
 #include "graph.hpp"
 #include <iostream>
-
 #include <algorithm>
+
 //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	//in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
 std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<ED::size_type> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id)
 {
-	
-	
 	std::vector<ED::NodeId> circuit;
 	circuit.push_back(node1_id);
 	circuit.push_back(node2_id);
@@ -84,27 +82,48 @@ void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> 
 
 int main()
 {
-	ED::Graph T{3};
+	ED::Graph T{5};
 	std::vector<ED::NodeId> labels;
 	labels.push_back(0);
 	labels.push_back(1);
 	labels.push_back(2);
+	labels.push_back(3);
+	labels.push_back(4);
 	std::vector<ED::size_type> sizes;
+	sizes.push_back(0);
+	sizes.push_back(0);
 	sizes.push_back(0);
 	sizes.push_back(0);
 	sizes.push_back(0);
 	T.add_edge(0,1);
 	T.add_edge(0,2);
+	T.add_edge(1,2);
+	T.add_edge(0,3);
+	T.add_edge(0,4);
+	T.add_edge(3,4);
 	std::vector<ED::size_type> levels;
 	levels.push_back(0);
 	levels.push_back(1);
 	levels.push_back(1);
-	std::vector<ED::NodeId> circuit = find_circuit(T, levels,1,2);
-	update_labels(labels, sizes, circuit);
-	for(unsigned int i =0; i<circuit.size();i++)
-		std::cout<<circuit.at(i)<<"\n";
+	levels.push_back(1);
+	levels.push_back(1);
+	
+	std::vector<ED::NodeId> circuit1 = find_circuit(T, levels,1,2);
+	std::vector<ED::NodeId> circuit2 = find_circuit(T, levels,3,4);
+	update_labels(labels, sizes, circuit1);
+	update_labels(labels, sizes, circuit2);
+	std::cout << "circuit1:" << std::endl;
+	for(unsigned int i =0; i<circuit1.size();i++)
+		std::cout << circuit1.at(i)<<"\n";
+	std::cout << "circuit2:" << std::endl;
+	for(unsigned int i =0; i<circuit2.size();i++)
+		std::cout<< circuit2.at(i)<<"\n";
+	std::cout << "label_sizes:" << std::endl;
 	for(unsigned int i = 0; i<sizes.size();i++)
 		std::cout<<i<<" - "<<sizes.at(i)<<"\n";
+    std::cout << "labels:" << std::endl;
+	for(unsigned int i = 0; i<labels.size();i++)
+		std::cout<<i<<" - "<<labels.at(i)<<"\n";	
 	return 0;
 	
 }
