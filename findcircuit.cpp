@@ -64,15 +64,18 @@ void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> 
 		roots.push_back(candidate);
 		root_sizes.push_back(label_sizes.at(candidate));
 	}
-	std::vector<ED::size_type>::iterator it = max_element(root_sizes.begin(), root_sizes.end());
-	ED::NodeId new_root = roots.at(*it);
+	unsigned int own_iterator = 0;
+	for(unsigned int i=1; i<root_sizes.size();i++)
+		if(root_sizes.at(i)>root_sizes.at(own_iterator))
+			own_iterator=i;
+	ED::NodeId new_root = roots.at(own_iterator);
 	bool same_size = false;
 	for(unsigned int i = 0; i<roots.size();i++)
 	{
 		labels.at(roots.at(i))= new_root;
 		
 		
-		if(roots.at(i)!=new_root && root_sizes.at(i)==root_sizes.at(*it))
+		if(roots.at(i)!=new_root && root_sizes.at(i)==root_sizes.at(own_iterator))
 		{
 			same_size=true;
 		}
