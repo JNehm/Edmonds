@@ -218,5 +218,54 @@ void remove_all_incident_edges(Graph & graph, NodeId id)
 		graph.delete_edge(id, (node.neighbors()).at(i));
 	}		
 }
+
+
+void unshrink_circuits(std::vector<std::vector<ED::NodeId>> & all_circuits, ED::Graph & matching)
+{
+	
+	while(all_circuits.size() != 0)
+	{
+		
+		std::vector<ED::NodeId> current_circuit = all_circuits.at(all_circuits.size()-1);
+		ED::size_type total_degree = 0;
+		std::vector<ED::size_type> degrees;
+		for(unsigned int i =0; i<current_circuit.size()-1; i++)
+		{
+			total_degree += matching.node(current_circuit.at(i)).degree();
+			degrees.push_back(matching.node(current_circuit.at(i)).degree());
+		}
+		
+		if(total_degree>1)
+			throw std::runtime_error("The pseudo node has more than one incident edge in the matching");
+		
+		else if(total_degree==1)
+		{
+			
+			std::vector<ED::size_type>::iterator it = find(degrees.begin(),degrees.end(),1);
+			std::vector<ED::size_type> firsthalf_degrees (degrees.begin(), it);
+			std::vector<ED::NodeId> firsthalf (current_circuit.begin(), current_circuit.begin()+firsthalf_degrees.size());
+			
+			std::vector<ED::NodeId> secondhalf (current_circuit.begin()+firsthalf_degrees.size()+1, current_circuit.end());
+			
+			reverse(firsthalf.begin(), firsthalf.end());
+			if(firsthalf.size()>0)
+				for(unsigned int i =0; i<(firsthalf.size()-1)/2;i++)
+					matching.add_edge(firsthalf.at(2*i),firsthalf.at(2*i+1));
+			for(unsigned int i =0; i<(secondhalf.size()-1)/2;i++)
+				matching.add_edge(secondhalf.at(2*i),secondhalf.at(2*i+1));	
+			
+		}
+		else
+			for(unsigned int i =0; i<(current_circuit.size()-1)/2; i++)
+				matching.add_edge(current_circuit.at(2*i), current_circuit.at(2*i+1));
+		
+		all_circuits.erase(all_circuits.end()-1);
+		
+		
+	}
+	
+	
+	
+}
    
 } //namespace ED

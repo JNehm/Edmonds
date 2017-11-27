@@ -64,6 +64,8 @@ namespace ED
 
 	void remove_all_incident_edges(Graph & graph, NodeId id);
 	
+	void unshrink_circuits(std::vector<std::vector<ED::NodeId>> & all_circuits, ED::Graph & matching);
+	
 	
 } //namespace ED
 
