@@ -32,7 +32,7 @@ namespace ED
    **/
    void initialize_labels(std::vector<size_type> & labels, size_type num_nodes);
    
-   // Find Matching-exposed vertex that is not isolated.
+   // Find Matching-exposed vertex that is not isolated (return constexpr invalid_node_id if only isolated nodes left).
    NodeId find_exposed_vertex(Graph & matching, Graph const & graph);
    
    /**

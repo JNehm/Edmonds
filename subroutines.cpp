@@ -33,7 +33,16 @@ NodeId find_exposed_vertex(Graph & matching, Graph const & graph)
 	{
 		if (((matching.node(i)).degree() == 0) && ((graph.node(i)).degree() != 0))
 		{
-			exposed_node_id = i;
+			NodeId degree = (graph.node(i)).degree();
+			bool all_neighbors_matched = true;
+			
+			//check if all neighbor nodes are matched (if yes, return invalid_node_id)
+			for (NodeId neighbor = 0; neighbor < degree; neighbor++)
+			{
+				if ((matching.node(neighbor)).degree() == 0) all_neighbors_matched = false; 
+			}
+			if (all_neighbors_matched == false) exposed_node_id = i;
+			break;
 		}
 	}
 
@@ -208,7 +217,7 @@ void remove_all_incident_edges(Graph & graph, NodeId id)
 	
 	for (size_type i = 0; i < neighbor_number; i++)
 	{
-		graph.delete_edge(id, (node.neighbors()).at(i));
+		graph.delete_edge(id, (node.neighbors()).at(0));
 	}		
 }
    
