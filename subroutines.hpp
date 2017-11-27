@@ -35,10 +35,6 @@ namespace ED
    // Find Matching-exposed vertex that is not isolated (return constexpr invalid_node_id if only isolated nodes left).
    NodeId find_exposed_vertex(Graph & matching, Graph const & graph);
    
-   // /**
-		// Check if while condition in perfect matching algorithm is fulfilled (if there exists an even-degree node in the tree with an non-odd-degree neighbor) and if yes, returns the pair.
-   // **/
-   // std::vector<NodeId> find_suitable_even_node (Graph const & graph, Graph & tree, std::vector<int> & levels);
    
    /** 
 	   Execution of Step 2 in the perfect matching algorithm: 

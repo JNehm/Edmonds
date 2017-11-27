@@ -49,31 +49,6 @@ NodeId find_exposed_vertex(Graph & matching, Graph const & graph)
 	return exposed_node_id;
 }
 
-// std::vector<NodeId> find_suitable_even_node (Graph const & graph, Graph & tree, std::vector<int> & levels)
-// {
-	// size_type num_nodes = tree.num_nodes();
-	// std::vector<NodeId> pair;
-	
-	// for (NodeId candidate_id = 0; candidate_id < num_nodes; candidate_id ++)
-	// {
-		//check if candidate node in Even(tree)
-		// if ((levels.at(candidate_id) % 2 == 1) || (levels.at(candidate_id) == -1)) continue;
-		
-		// Node const & candidate_node = graph.node(candidate_id);
-	
-		// for (size_type i = 0; i < (candidate_node.neighbors()).size(); i++)
-		// {
-			// NodeId candidate_neighbor_id = (candidate_node.neighbors()).at(i);
-			// if(levels.at(candidate_neighbor_id) % 2 == 0 || levels.at(candidate_neighbor_id) == -1)
-			// {
-				// pair.push_back(candidate_id);
-				// pair.push_back(candidate_neighbor_id);
-				// return pair;
-			// }	
-		// }	 
-	// }
-	// return pair; 
-// }
 
 void tree_extension(Graph & tree, Graph const & graph, Graph & matching, NodeId const nodex_id, NodeId const nodey_id, std::vector<int> & levels, std::vector<std::vector<NodeId>> & candidate_edges)
 {
@@ -92,44 +67,6 @@ void tree_extension(Graph & tree, Graph const & graph, Graph & matching, NodeId 
    
    add_outgoing_candidate_edges (graph, candidate_edges, nodez_id);
 }
-
-
-//TO DO: Korrekte Version Matching einfügen
-void matching_augmentation (Graph & tree, NodeId const root_id, Graph & matching, NodeId const nodex_id, NodeId const nodey_id, std::vector<int> & levels, std::vector<size_type> &labels)  // add edge {node_add_id, node_neighbor_id}, delete edge{node_neighbor_id, node_del_id}
-{
-   // NodeId node_add_id = root_id;
-
-   // NodeId node_neighbor_id;
-   // NodeId node_del_id;
-   
-   // if (isinMatching(matching, root_id)) 
-   // {
-	   // std::cout << "Error: Tree can not be augmented, the root is already in the matching! (i.e., this was not an M-alternating tree to begin with)";
-	   // return;
-   // }
-  
-   // while(labels.at(node_add_id) != labels.at(nodex_id))
-   // {	   
-	   // int i = 0;
-	   // node neighbor_id = next_vertex_outside_circuit(tree, labels, node_add_id, node_add_id);
-	   
-	   ////TO DO: Anpassen
-	   
-	   ////choose the right neighbor node in the tree (i.e. which is farther away from root and in the matching)
-	   // while ((levels.at(node_neighbor_id) < levels.at(node_add_id)) || (isinMatching(matching, node_neighbor_id) == false))
-	   // {
-		   // ++i;
-		   // node_neighbor_id = (tree.node(node_add_id)).neighbors()[i];   
-	   // }
-	   // node_del_id = (matching.node(node_neighbor_id)).neighbors()[0];
-	   
-	   // matching.add_edge(node_add_id, node_neighbor_id);
-	   // matching.delete_edge(node_neighbor_id, node_del_id);
-	   
-	   // node_add_id = node_del_id;
-   // }
-   // matching.add_edge(nodex_id, nodey_id);		   
-}   
 
    
    //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
@@ -195,7 +132,7 @@ void add_outgoing_candidate_edges (Graph const & graph, std::vector<std::vector<
 }
 	
 
-void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, Graph const & graph, std::vector<std::vector<NodeId>> & candidate_edges, std::vector<int> const levels)
+void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, Graph consthelp & graph, std::vector<std::vector<NodeId>> & candidate_edges, std::vector<int> const levels)
 {
 	std::vector<ED::NodeId> roots;
 	std::vector<ED::size_type> root_sizes;
