@@ -68,7 +68,50 @@ void tree_extension(Graph & tree, Graph const & graph, Graph & matching, NodeId 
    add_outgoing_candidate_edges (graph, candidate_edges, nodez_id);
 }
 
-   
+   void matching_augmentation (Graph & tree, NodeId const root_id, Graph & matching, NodeId const nodex_id, NodeId const nodey_id, std::vector<int> & levels, std::vector<size_type> &labels)  // add edge {node_add_id, node_neighbor_id}, delete edge{node_neighbor_id, node_del_id}
+{
+	std::vector<ED::NodeId> path;
+	path.push_back(nodey_id);
+	path.push_back(nodex_id);
+	NodeId endpoint = nodex_id;
+	while(endpoint!=root_id)
+	{
+		int level=levels.at(endpoint);
+		Node end_node = tree.node(endpoint);
+		bool found = false;
+		for(unsigned int i=0;i<end_node.degree() && found==false;i++)
+		{
+			
+			NodeId neighbor_id = end_node.neighbors().at(i); 
+			if(levels.at(neighbor_id)==level-1)
+			{
+				found = true;
+				endpoint = neighbor_id;
+				path.push_back(neighbor_id);
+			}
+		}
+	}
+	std::vector<size_type> final_labels;
+	for(unsigned int i=0; i<path.size(); i++)
+	{
+		NodeId candidate = path.at(i);
+		while(labels.at(candidate)!=candidate)
+			candidate=labels.at(candidate);
+		final_labels.push_back(candidate);
+	}
+	unsigned int counter = 0;
+	for(unsigned int i = 0; i<path.size()-1; i++)
+		if(final_labels.at(i)!=final_labels.at(i+1))
+		{
+			if(counter % 2 == 0)
+				matching.add_edge(path.at(i), path.at(i+1));
+			else
+				matching.delete_edge(path.at(i), path.at(i+1));
+			counter++;
+		}
+}
+	
+	
    //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	//in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
 std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, std::vector<std::vector<ED::NodeId>> & all_circuits)
@@ -188,4 +231,49 @@ void remove_all_incident_edges(Graph & graph, NodeId id)
 	}		
 }
    
+void unshrink_circuits(std::vector<std::vector<ED::NodeId>> & all_circuits, ED::Graph & matching)
+{
+	
+	while(all_circuits.size() != 0)
+	{
+		
+		std::vector<ED::NodeId> current_circuit = all_circuits.at(all_circuits.size()-1);
+		ED::size_type total_degree = 0;
+		std::vector<ED::size_type> degrees;
+		for(unsigned int i =0; i<current_circuit.size()-1; i++)
+		{
+			total_degree += matching.node(current_circuit.at(i)).degree();
+			degrees.push_back(matching.node(current_circuit.at(i)).degree());
+		}
+		
+		if(total_degree>1)
+			throw std::runtime_error("The pseudo node has more than one incident edge in the matching");
+		
+		else if(total_degree==1)
+		{
+			
+			std::vector<ED::size_type>::iterator it = find(degrees.begin(),degrees.end(),1);
+			std::vector<ED::size_type> firsthalf_degrees (degrees.begin(), it);
+			std::vector<ED::NodeId> firsthalf (current_circuit.begin(), current_circuit.begin()+firsthalf_degrees.size());
+			
+			std::vector<ED::NodeId> secondhalf (current_circuit.begin()+firsthalf_degrees.size()+1, current_circuit.end());
+			
+			reverse(firsthalf.begin(), firsthalf.end());
+			if(firsthalf.size()>0)
+				for(unsigned int i =0; i<(firsthalf.size()-1)/2;i++)
+					matching.add_edge(firsthalf.at(2*i),firsthalf.at(2*i+1));
+			for(unsigned int i =0; i<(secondhalf.size()-1)/2;i++)
+				matching.add_edge(secondhalf.at(2*i),secondhalf.at(2*i+1));	
+			
+		}
+		else
+			for(unsigned int i =0; i<(current_circuit.size()-1)/2; i++)
+				matching.add_edge(current_circuit.at(2*i), current_circuit.at(2*i+1));
+		
+		all_circuits.erase(all_circuits.end()-1);
+		
+		
+	}
+		
+	
 } //namespace ED
