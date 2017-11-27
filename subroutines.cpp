@@ -94,39 +94,46 @@ void tree_extension(Graph & tree, Graph & matching, NodeId const nodex_id, NodeI
 
 void matching_augmentation (Graph & tree, NodeId const root_id, Graph & matching, NodeId const nodex_id, NodeId const nodey_id, std::vector<int> & levels, std::vector<size_type> &labels)  // add edge {node_add_id, node_neighbor_id}, delete edge{node_neighbor_id, node_del_id}
 {
-   NodeId node_add_id = root_id;
-
-   //arbitrary initialization
-   NodeId node_neighbor_id = root_id;
-   NodeId node_del_id = root_id;
-   
-   if (isinMatching(matching, root_id)) 
-   {
-	   std::cout << "Error: Tree can not be augmented, the root is already in the matching! (i.e., this was not an M-alternating tree to begin with)";
-	   return;
-   }
-  
-   while(node_add_id != nodex_id)
-   {	   
-	   int i = 0;
-	   node_neighbor_id = (tree.node(node_add_id)).neighbors()[0];
-	   
-	   //choose the right neighbor node in the tree (i.e. which is farther away from root and in the matching)
-	   while ((levels.at(node_neighbor_id) < levels.at(node_add_id)) || (isinMatching(matching, node_neighbor_id) == false))
-	   {
-		   ++i;
-		   node_neighbor_id = (tree.node(node_add_id)).neighbors()[i];   
-	   }
-	   node_del_id = (matching.node(node_neighbor_id)).neighbors()[0];
-	   
-	   matching.add_edge(node_add_id, node_neighbor_id);
-	   matching.delete_edge(node_neighbor_id, node_del_id);
-	   
-	   node_add_id = node_del_id;
-   }
-   matching.add_edge(nodex_id, nodey_id);		   
-}   
-
+	std::vector<ED::NodeId> path;
+	path.push_back(nodey_id);
+	path.push_back(nodex_id);
+	NodeId endpoint = nodex_id;
+	while(endpoint!=root_id)
+	{
+		int level=levels.at(endpoint);
+		Node end_node = tree.node(endpoint);
+		bool found = false;
+		for(unsigned int i=0;i<end_node.degree() && found==false;i++)
+		{
+			
+			NodeId neighbor_id = end_node.neighbors().at(i); 
+			if(levels.at(neighbor_id)==level-1)
+			{
+				found = true;
+				endpoint = neighbor_id;
+				path.push_back(neighbor_id);
+			}
+		}
+	}
+	std::vector<size_type> final_labels;
+	for(unsigned int i=0; i<path.size(); i++)
+	{
+		NodeId candidate = path.at(i);
+		while(labels.at(candidate)!=candidate)
+			candidate=labels.at(candidate);
+		final_labels.push_back(candidate);
+	}
+	unsigned int counter = 0;
+	for(unsigned int i = 0; i<path.size()-1; i++)
+		if(final_labels.at(i)!=final_labels.at(i+1))
+		{
+			if(counter % 2 == 0)
+				matching.add_edge(path.at(i), path.at(i+1));
+			else
+				matching.delete_edge(path.at(i), path.at(i+1));
+			counter++;
+		}
+}
    
    //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	//in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
