@@ -32,7 +32,7 @@ namespace ED
    **/
    void initialize_labels(std::vector<size_type> & labels, size_type num_nodes);
    
-   // Find Matching-exposed vertex that is not isolated (return constexpr invalid_node_id if only isolated nodes left).
+   // Find Matching-exposed vertex that is not isolated.
    NodeId find_exposed_vertex(Graph & matching, Graph const & graph);
    
    /**
@@ -58,11 +58,13 @@ namespace ED
 	circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
 	**/
-	std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id);
+	std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, std::vector<std::vector<ED::NodeId>> & all_circuits);
 
-	void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit);
+	void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, Graph & current_matching);
 
 	void remove_all_incident_edges(Graph & graph, NodeId id);
+	
+	void unshrink_circuits(std::vector<std::vector<ED::NodeId>> & all_circuits, ED::Graph & matching);
 	
 	
 } //namespace ED
