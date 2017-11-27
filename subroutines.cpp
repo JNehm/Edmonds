@@ -33,7 +33,7 @@ NodeId find_exposed_vertex(Graph & matching, Graph const & graph)
 	{
 		if (((matching.node(i)).degree() == 0) && ((graph.node(i)).degree() != 0))
 		{
-			NodeId degree = (graph.node(i)).degree();
+			/*NodeId degree = (graph.node(i)).degree();
 			bool all_neighbors_matched = true;
 			
 			//check if all neighbor nodes are matched (if yes, return invalid_node_id)
@@ -41,7 +41,8 @@ NodeId find_exposed_vertex(Graph & matching, Graph const & graph)
 			{
 				if ((matching.node(neighbor)).degree() == 0) all_neighbors_matched = false; 
 			}
-			if (all_neighbors_matched == false) exposed_node_id = i;
+			if (all_neighbors_matched == false) exposed_node_id = i;*/
+			exposed_node_id = i;
 			break;
 		}
 	}
@@ -274,6 +275,8 @@ void unshrink_circuits(std::vector<std::vector<ED::NodeId>> & all_circuits, ED::
 		
 		
 	}
-		
 	
-} //namespace ED
+}
+}
+		
+	 //namespace ED

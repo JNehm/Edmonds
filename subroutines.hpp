@@ -55,7 +55,7 @@ namespace ED
 	circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
 	**/
-	std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, , std::vector<std::vector<ED::NodeId>> & all_circuits);
+	std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, std::vector<std::vector<ED::NodeId>> & all_circuits);
 
 	//add candidate edges to be considered in while condition (cf. line 2 of the perfect matching algorithm in the script)
 	void add_outgoing_candidate_edges (Graph const & graph, std::vector<std::vector<NodeId>> & candidate_edges, NodeId nodex_id);

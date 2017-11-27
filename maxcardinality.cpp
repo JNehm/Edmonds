@@ -5,6 +5,7 @@
 #include <iostream>
 #include <algorithm>
 #include <vector>
+#include <cstring>
 
 namespace ED 
 {
@@ -39,10 +40,19 @@ namespace ED
 	
 } //namespace ED
 
-int main()
+int main(int argc, char** argv)
 {	
 	// ED::Graph const graph = ED::read_input ("K4.dmx");
 	// ED::perfect_matching(graph);
-	
-	std::cout << ED::max_cardinality("peterson.dmx") << std::endl;
+	std::string filename;
+	for(int i=0; i<argc; i++)
+	{
+		if(std::strcmp(argv[i], "--graph")==0)
+			if(i+1 < argc)
+				filename = argv[i+1];
+		
+	}
+	ED::Graph test_graph = ED::read_input(filename);
+	std::cout << ED::perfect_matching(test_graph) << std::endl;
+	//std::cout << ED::max_cardinality(filename) << std::endl;
 }
