@@ -16,21 +16,27 @@ Graph perfect_matching(Graph const graph)
 	
 	if(root_id == invalid_node_id) return matching;
 	
+	std::vector<std::vector<NodeId>> candidate_edges; //L in script
+	add_outgoing_candidate_edges (graph, candidate_edges, root_id);
 	std::vector<NodeId> labels (num_nodes);
 	std::vector<NodeId> label_sizes(num_nodes);
 	std::vector<int> levels (num_nodes);
 	initialize_levels(levels, root_id);
 	initialize_labels(labels, num_nodes);
 
-	std::vector<NodeId> pair(2);
-	
-	
-	
-	while (find_suitable_even_node(graph, tree, levels).size() != 0) 
+
+	while (candidate_edges.size() > 0) 
 	{
-		pair = find_suitable_even_node(graph, tree, levels);
+		std::vector<NodeId> pair = candidate_edges.at(0);
 		NodeId nodex_id = pair.at(0);
 		NodeId nodey_id = pair.at(1);
+		
+		//continue, if both nodes lie in the same circuit
+		if (labels.at(nodex_id) == labels.at(nodey_id))
+		{
+			candidate_edges.erase(candidate_edges.begin());
+			continue;
+		}
 		
 		int level_y = levels.at(nodey_id);
 		bool yinmatching = (matching.node(nodey_id)).degree();
@@ -65,6 +71,9 @@ Graph perfect_matching(Graph const graph)
 					return matching;
 				} 
 				initialize_levels(levels, root_id);
+				initialize_labels(labels, num_nodes);
+				candidate_edges.clear();
+				add_outgoing_candidate_edges (graph, candidate_edges, root_id);
 			}
 		}
 		
@@ -72,14 +81,16 @@ Graph perfect_matching(Graph const graph)
 		//Case 2: Extend tree 
 		else if (level_y == -1 && yinmatching == true)
 		{
-			tree_extension (tree, matching, nodex_id, nodey_id, levels);
+			tree_extension (tree, graph, matching, nodex_id, nodey_id, levels, candidate_edges);
+			candidate_edges.erase(candidate_edges.begin());
 		}
 		
 		//Case 3: "Shrink circuit" (update labels)
-		else
+		else if (level_y % 2 == 0 || labels.at(nodey_id) != nodey_id) //if both nodes are in Even(tree) or nodey is already in a circuit
 		{
 			std::vector<NodeId> const circuit = find_circuit(tree, levels, nodex_id, nodey_id);
-			update_labels(labels, label_sizes, circuit);
+			update_labels(labels, label_sizes, circuit, graph, candidate_edges, levels);
+			candidate_edges.erase(candidate_edges.begin());
 		}
 	}
 	std::cout << "Found a frustrated tree! G has no perfect matching." << std::endl;
