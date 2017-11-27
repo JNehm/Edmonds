@@ -14,8 +14,10 @@ bool isinMatching(Graph & matching, NodeId id)
 
 void initialize_levels(std::vector<int> & levels, NodeId const root_id)
 {
+	
 	std::fill(levels.begin(), levels.end(), -1);
 	levels.at(root_id) = 0;
+	
 }
 
 void initialize_labels(std::vector<size_type> & labels, size_type num_nodes)
@@ -33,16 +35,7 @@ NodeId find_exposed_vertex(Graph & matching, Graph const & graph)
 	{
 		if (((matching.node(i)).degree() == 0) && ((graph.node(i)).degree() != 0))
 		{
-			NodeId degree = (graph.node(i)).degree();
-			bool all_neighbors_matched = true;
-			
-			//check if all neighbor nodes are matched (if yes, return invalid_node_id)
-			for (NodeId neighbor = 0; neighbor < degree; neighbor++)
-			{
-				if ((matching.node(neighbor)).degree() == 0) all_neighbors_matched = false; 
-			}
-			if (all_neighbors_matched == false) exposed_node_id = i;
-			break;
+			exposed_node_id = i;
 		}
 	}
 
@@ -130,7 +123,7 @@ void matching_augmentation (Graph & tree, NodeId const root_id, Graph & matching
    
    //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	//in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
-std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id)
+std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, std::vector<std::vector<ED::NodeId>> & all_circuits)
 {
 	std::vector<ED::NodeId> circuit;
 	circuit.push_back(node1_id);
@@ -172,11 +165,11 @@ std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const l
 			}
 		}
 	}
-	
+	all_circuits.push_back(circuit);
 	return circuit;
 }
 
-void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit)
+void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, ED::Graph & current_matching)
 {
 	std::vector<ED::NodeId> roots;
 	std::vector<ED::size_type> root_sizes;
@@ -208,6 +201,11 @@ void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> 
 	}
 	if(same_size==true)
 		label_sizes.at(new_root)++;	
+	
+	for(unsigned int i=0; i<circuit.size()-1;i++)
+		if(current_matching.node(circuit.at(i)).degree() !=0 && current_matching.node(circuit.at(i)).neighbors().at(0)==circuit.at(i+1))
+			current_matching.delete_edge(circuit.at(i),circuit.at(i+1));
+	
 }
 
 void remove_all_incident_edges(Graph & graph, NodeId id)
@@ -217,7 +215,7 @@ void remove_all_incident_edges(Graph & graph, NodeId id)
 	
 	for (size_type i = 0; i < neighbor_number; i++)
 	{
-		graph.delete_edge(id, (node.neighbors()).at(0));
+		graph.delete_edge(id, (node.neighbors()).at(i));
 	}		
 }
    
