@@ -12,7 +12,9 @@ Graph perfect_matching(Graph const graph)
 	NodeId num_nodes = graph.num_nodes();
 	Graph matching (num_nodes);
 	Graph tree (num_nodes);
-	NodeId root_id = 0;	
+	NodeId root_id = find_exposed_vertex(matching, graph);	
+	
+	if(root_id == invalid_node_id) return matching;
 	
 	std::vector<NodeId> labels (num_nodes);
 	std::vector<NodeId> label_sizes(num_nodes);
@@ -42,7 +44,7 @@ Graph perfect_matching(Graph const graph)
 			matching_augmentation (tree, root_id, matching, nodex_id, nodey_id, levels, labels);
 						
 			//Case 1.a: perfect matching
-			if(matching.num_edges()== (num_nodes/2))
+			if(matching.num_edges()== (num_nodes/2) && (num_nodes % 2 == 0))
 			{
 				std::cout << "Found perfect matching:" << std::endl;
 				std::cout << matching << std::endl;
@@ -52,11 +54,14 @@ Graph perfect_matching(Graph const graph)
 			else
 			{	
 				//matching = unshrunk_matching;
+				
 				tree = Graph(num_nodes);
 				root_id = find_exposed_vertex (matching, graph);
+					
+				// check if all remaining nodes are isolated or only adjacent to matched nodes
 				if (root_id == invalid_node_id)
 				{
-					std::cout << "Only isolated nodes left! Matching is maximal. " << std::endl;
+					std::cout << "Matching is maximal. " << std::endl;
 					return matching;
 				} 
 				initialize_levels(levels, root_id);
