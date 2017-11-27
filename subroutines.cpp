@@ -71,7 +71,7 @@ void tree_extension(Graph & tree, Graph const & graph, Graph & matching, NodeId 
    
    //circuit includes all NodeId in the circuit C formed by the edge {node1_id,node2_id} and T,
 	//in the form that the first and last entry in circuit are the same and the edges in C are the edges between successive entries in circuit
-std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id)
+std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const levels, ED::NodeId const node1_id, ED::NodeId const node2_id, std::vector<std::vector<ED::NodeId>> & all_circuits)
 {
 	std::vector<ED::NodeId> circuit;
 	circuit.push_back(node1_id);
@@ -113,6 +113,7 @@ std::vector<ED::NodeId> find_circuit(ED::Graph const T, std::vector<int> const l
 			}
 		}
 	}
+	all_circuits.push_back(circuit);
 	
 	return circuit;
 }
@@ -132,7 +133,7 @@ void add_outgoing_candidate_edges (Graph const & graph, std::vector<std::vector<
 }
 	
 
-void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, Graph consthelp & graph, std::vector<std::vector<NodeId>> & candidate_edges, std::vector<int> const levels)
+void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> & label_sizes, std::vector<ED::NodeId> const circuit, ED::Graph & current_matching, Graph const & graph, std::vector<std::vector<NodeId>> & candidate_edges, std::vector<int> const levels)
 {
 	std::vector<ED::NodeId> roots;
 	std::vector<ED::size_type> root_sizes;
@@ -164,6 +165,10 @@ void update_labels(std::vector<ED::NodeId> & labels, std::vector<ED::size_type> 
 	}
 	if(same_size==true)
 		label_sizes.at(new_root)++;	
+
+	for(unsigned int i=0; i<circuit.size()-1;i++)
+		if(current_matching.node(circuit.at(i)).degree() !=0 && current_matching.node(circuit.at(i)).neighbors().at(0)==circuit.at(i+1))
+			current_matching.delete_edge(circuit.at(i),circuit.at(i+1));
 	
 	//add all outgoing edges of odd-degree nodes in the circuit to candidate_edges
 	for (NodeId i = 0; i < circuit.size()-1; i++)
