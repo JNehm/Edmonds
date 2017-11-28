@@ -119,6 +119,7 @@ Graph read_input(std::string filename)
 	
 	std::string nextline;
 	std::ifstream graph_file (filename);
+	
 	if(graph_file)
 	{
 		
@@ -141,7 +142,8 @@ Graph read_input(std::string filename)
 				
 			}
 		}
-		
+		if(initialized==false)
+			std::cout<<"The file does not contain a dmx-code"<<std::endl;
 		ED::Graph result{num_nodes};
 		
 		
@@ -160,12 +162,12 @@ Graph read_input(std::string filename)
 		}	
 		
 		if(!check_num_edges || result.num_edges()!=check_num_edges)
-			throw std::runtime_error("The number of encoded edges does not match the initial number\n");
+			std::cout<<"The number of encoded edges does not match the initial number"<<std::endl;
 	
 	
 	return result;
 	}
-	throw std::runtime_error("No such file found");
+	std::cout<<"No such file found!"<<std::endl;
 }
 
 
