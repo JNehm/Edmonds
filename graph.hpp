@@ -182,6 +182,9 @@ Node const & Graph::node(NodeId const id) const
 }
 //END: Inline section
 
+Graph read_input(std::string filename);
+
+
 } // namespace ED
 
 #endif /* GRAPH_HPP */
